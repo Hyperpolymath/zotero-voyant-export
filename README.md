@@ -12,12 +12,14 @@ data via Voyant.
 ## Version 2.0 - Zotero 7 Compatible
 
 This version has been completely rewritten for Zotero 7 compatibility using modern
-tooling:
+tooling based on the [zoterho-template](https://gitlab.com/extensions-library/zotero/zoterho-template) architecture:
 
-- **ReScript** for type-safe code
-- **Modern JavaScript (ESM)** with .mjs modules
-- **WebExtension Manifest v2** for Zotero 7
-- Based on the [zoterho-template](https://gitlab.com/extensions-library/zotero/zoterho-template) architecture
+- **ReScript** for type-safe code compilation to JavaScript
+- **Deno** as the runtime environment (no npm dependencies)
+- **CUE** for configuration management and generation
+- **Just** for task automation
+- **web-ext** for extension development and packaging
+- **WebExtension Manifest v2** for Zotero 7 compatibility
 
 ## Requirements
 
@@ -44,64 +46,150 @@ able to see your corpus in the default Voyant view.
 
 ### Prerequisites
 
-- Node.js 18+
-- npm
+This project uses a modern toolchain. Install the following:
+
+1. **Deno** (v1.40+): https://deno.land/
+   ```bash
+   curl -fsSL https://deno.land/install.sh | sh
+   ```
+
+2. **Just** command runner: https://github.com/casey/just
+   ```bash
+   # macOS/Linux
+   curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to ~/.local/bin
+   ```
+
+3. **CUE** configuration language: https://cuelang.org/
+   ```bash
+   # macOS
+   brew install cue
+   # Or download from https://github.com/cue-lang/cue/releases
+   ```
 
 ### Setup
 
 ```bash
-npm install
+# Clone the repository
+git clone https://github.com/corajr/zotero-voyant-export.git
+cd zotero-voyant-export
+
+# Generate configuration files from CUE
+just config
+
+# Initialize dependencies
+just setup
 ```
 
-### Build
+### Build Commands
 
-Build the extension:
-
-```bash
-npm run build
-```
-
-Watch mode for development:
+All build commands are managed through `just`. Run `just` to see all available commands:
 
 ```bash
-npm run dev
-```
-
-Create XPI package:
-
-```bash
-npm run package
+just                # List all available commands
+just rebuild        # Clean build from scratch
+just dev            # Development mode (rebuild + watch)
+just build          # Build ReScript to JavaScript
+just watch          # Watch mode for development
+just package        # Create XPI package for distribution
+just run            # Test in Firefox
+just lint           # Lint ReScript code
+just fmt            # Format ReScript code
+just clean          # Clean build artifacts
+just info           # Show project information
 ```
 
 ### Project Structure
 
 ```
-├── config/           # CUE configuration files (for future use)
-├── src/              # ReScript source files
-│   ├── background.res   # Main entry point
-│   ├── Zotero.res       # Zotero API bindings
-│   ├── Exporter.res     # Export logic
-│   ├── Format.res       # MODS/DC XML generation
-│   └── UI.res           # Menu items and file picker
-├── ui/               # UI assets (icons, etc.)
-├── manifest.json     # WebExtension manifest
-├── rescript.json     # ReScript configuration
-└── package.json      # npm configuration
+├── config/              # CUE configuration source files
+│   ├── project.cue      # Project metadata and manifest definition
+│   ├── deno.cue         # Deno configuration and tasks
+│   ├── rescript.cue     # ReScript compiler configuration
+│   └── manifest.cue     # Export helper for manifest.json
+│
+├── src/                 # ReScript source files
+│   ├── background.res   # Main entry point & initialization
+│   ├── Zotero.res       # Type-safe Zotero API bindings
+│   ├── Exporter.res     # Collection export logic
+│   ├── Format.res       # MODS & Dublin Core XML generation
+│   └── UI.res           # Menu items & file picker
+│
+├── ui/                  # UI assets (icons, etc.)
+│
+├── justfile             # Task automation (replaces Makefile/npm scripts)
+└── README.md            # This file
+
+# Generated files (not in source control):
+├── manifest.json        # Generated from config/project.cue
+├── deno.json           # Generated from config/deno.cue
+├── rescript.json       # Generated from config/rescript.cue
+└── src/**/*.mjs        # Generated from src/**/*.res
 ```
+
+### How It Works
+
+1. **CUE Configuration**: All configuration lives in `config/*.cue` files
+   - `just config` exports CUE to JSON (manifest.json, deno.json, rescript.json)
+   - Single source of truth for project metadata
+
+2. **ReScript Compilation**: Type-safe ReScript (.res) compiles to JavaScript (.mjs)
+   - Deno runs ReScript compiler via npm: imports
+   - In-source build: .mjs files generated alongside .res files
+
+3. **Extension Loading**: Zotero loads the extension via manifest.json
+   - background.mjs executes on startup
+   - Context menu added to collections
+   - Export functionality triggered by user
+
+4. **Build Automation**: Just handles all tasks
+   - Configuration generation
+   - Compilation
+   - Packaging
+   - Testing
+
+### Development Workflow
+
+```bash
+# 1. Make changes to ReScript files in src/
+vim src/Exporter.res
+
+# 2. Rebuild and watch for changes
+just dev
+
+# 3. Test in Firefox (in another terminal)
+just run
+
+# 4. Create production build
+just package
+```
+
+### Configuration Management
+
+All project configuration is managed through CUE files in `config/`:
+
+- **config/project.cue**: Project metadata, version, manifest definition
+- **config/deno.cue**: Deno tasks for running ReScript and web-ext
+- **config/rescript.cue**: ReScript compiler configuration
+
+To modify configuration:
+1. Edit the appropriate `.cue` file
+2. Run `just config` to regenerate JSON files
+3. Rebuild with `just rebuild`
 
 ### Tech Stack
 
-- **ReScript**: Type-safe language that compiles to JavaScript
-- **@rescript/core**: Standard library for ReScript
-- **web-ext**: Mozilla's tool for building and testing extensions
+- **[ReScript](https://rescript-lang.org/)**: Type-safe language compiling to JavaScript
+- **[Deno](https://deno.land/)**: Secure runtime for JavaScript/TypeScript
+- **[CUE](https://cuelang.org/)**: Configuration language with validation
+- **[Just](https://github.com/casey/just)**: Command runner and task automation
+- **[web-ext](https://github.com/mozilla/web-ext)**: Firefox extension development tool
 
-### How it Works
+### Credits
 
-1. ReScript (.res) files in `src/` are compiled to JavaScript (.mjs) files
-2. The manifest.json defines the extension for Zotero 7
-3. background.mjs is loaded when Zotero starts
-4. A context menu item is added to collections
-5. When clicked, items are exported with metadata to a zip file
+This project's architecture is based on the [zoterho-template](https://gitlab.com/extensions-library/zotero/zoterho-template)
+by the Zotero community, which provides a production-ready framework for building modern Zotero 7 extensions.
+
+Original extension concept and implementation by Cora Johnson-Roberson.
 
 [local-voyant]: http://docs.voyant-tools.org/resources/run-your-own/voyant-server/
 
