@@ -1,0 +1,37 @@
+{
+  "name": "zotero-voyant-export",
+  "version": "2.0.0",
+  "description": "Export your Zotero collections to Voyant",
+  "main": "src/background.mjs",
+  "type": "module",
+  "directories": {
+    "doc": "docs",
+    "lib": "lib"
+  },
+  "scripts": {
+    "clean": "rescript clean",
+    "build": "rescript build",
+    "dev": "rescript build -w",
+    "ext:build": "web-ext build --overwrite-dest",
+    "ext:run": "web-ext run",
+    "ext:lint": "web-ext lint",
+    "rebuild": "npm run clean && npm run build",
+    "package": "npm run rebuild && npm run ext:build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://local_proxy@127.0.0.1:32274/git/Hyperpolymath/zotero-voyant-export"
+  },
+  "keywords": [
+    "zotero",
+    "voyant",
+    "text-analysis"
+  ],
+  "author": "Cora Johnson-Roberson",
+  "license": "GPL-3.0",
+  "devDependencies": {
+    "@rescript/core": "^1.6.1",
+    "rescript": "^11.1.4",
+    "web-ext": "^9.1.0"
+  }
+}
