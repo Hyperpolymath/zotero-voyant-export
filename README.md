@@ -1,58 +1,43 @@
-# Zotero Voyant Export [UNMAINTAINED]
-
-I no longer personally get a chance to do research very often, and so haven't
-been able to keep pace with the many changes to Zotero and the Firefox ecosystem.
-
-If someone wants to do something with the code, you have my full blessing. The
-code is under GPL3, aiming to be compatible with Voyant and Zotero's licenses.
-
-<hr>
+# Zotero Voyant Export
 
 Export your Zotero collections to Voyant.
 
-[Voyant](http://voyant-tools.org/) is "a web-based text analysis and reading
-environment" that lets you visualize the content of a text
-corpus. [Zotero](https://www.zotero.org/) is a "a free, easy-to-use tool to help
-you collect, organize, cite, and share your research sources." This translator
-aims to help those with preexisting Zotero collections get a new view on their
-data via Voyant.
+[Voyant](http://voyant-tools.org/) is "a web-based text analysis and reading environment" that lets you visualize the content of a text corpus. 
+
+[Zotero](https://www.zotero.org/) is a "a free, easy-to-use tool to help you collect, organize, cite, and share your research sources." 
+
+This translator aims to help those with preexisting Zotero collections get a new view on their data via Voyant.
 
 ## Requirements
 
-* [Zotero Standalone 5.0][zot] or higher; note that **the beta will irreversibly
-upgrade your database** (!), so take care to backup beforehand.
+* [Zotero Standalone 5.0][zot] or higher; note that **the beta will irreversibly upgrade your database** (!), so take care to backup beforehand.
 * a collection containing full texts (as PDFs, HTML snapshots, etc.)
 
 ## Installation
 
-Download the latest [release][release] of the XPI (click "Save Link As..." if in
-Firefox). Then open Zotero Standalone and select the Tools menu -> Add-ons.
-Click the gear icon in the upper right and select "Install Add-On From File...";
-open the XPI file you just saved.
+Download the latest [release][release] of the XPI (click "Save Link As..." if in Firefox). Then open Zotero Standalone and select the Tools menu -> Add-ons.
+Click the gear icon in the upper right and select "Install Add-On From File..."; open the XPI file you just saved.
 
 ## Usage
 
-Right-click on the collection you wish to analyze. Select "Export Collection to
-Voyant..." and choose a save location for the corpus as a zip file.
+Right-click on the collection you wish to analyze. Select "Export Collection to Voyant..." and choose a save location for the corpus as a zip file.
 
-Upload the resulting zip to [voyant-tools.org](voyant-tools.org) (or
-to [your local Voyant server][local-voyant] -- for collections larger than a
-handful of documents, you'll probably want to host locally). You should then be
-able to see your corpus in the default Voyant view.
+Upload the resulting zip to [voyant-tools.org](voyant-tools.org) (or to [your local Voyant server][local-voyant] -- 
+For collections larger than a handful of documents, you'll probably want to host locally). You should then be able to see your corpus in the default Voyant view.
 
 ## Development
 
-This is a work-in-progress. Please see the [initial release project][project]
-for an indication of what has been/will be done. Help is very welcome!
+I have started with a code update to modern, dependable, and secure languages, as part of my rhodiumising of repositories work.
+At the moment I have only just completed a sweep at a top level, and so there is more work to be done to get this to production.
+Please be patient whilst I get round to that - I am not paid as part of this side to my work, rather offering skills to support Zotero's cause.
 
-### Build
+## Build
 
-Run `make` to create a new XPI.
+Run `just build` to create a new XPI.
 
-Signing can be done with `make sign`, if you have the `JWT_ISSUER` and
-`JWT_SECRET` environment variables set. The `update.rdf` will be signed with
-[uhura](http://www.softlights.net/projects/mxtools/) (make sure you have the
-private key file path as `UHURA_PEM_FILE` in your environment).
+Signing can be done with `just sign`, if you have the `JWT_ISSUER` and `JWT_SECRET` environment variables set. 
+The `update.rdf` will be signed with [uhura](http://www.softlights.net/projects/mxtools/) 
+NOTE: Make sure you have the private key file path as `UHURA_PEM_FILE` in your environment (scripts for major shells in scripts folder).
 
 ### Tests
 
@@ -67,19 +52,8 @@ jpm test -b /Applications/Nightly.app/
 [release]: https://github.com/corajr/zotero-voyant-export/releases
 [project]: https://github.com/corajr/zotero-voyant-export/projects/1
 
-
-
 ## LICENSE
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+This project is licensed under the MIT License. This is an OSI-approved license that removes all friction for adoption while protecting the core intellectual contributions of the MAA framework.
+It is also dual-licensed under the Palimpsest License (v0.6). This is the preferred license for users, projects, and organisations who wish to formally commit to the foundational axiological principles of this framework.
+See the LICENSE (Apache 2.0) and PALIMPSEST_LICENSE_v0.6.md files in the root of this repository.
