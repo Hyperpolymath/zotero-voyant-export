@@ -1,76 +1,209 @@
-= zotero-voyant-export
-Jonathan D.A. Jewell <jonathan.jewell@gmail.com>
-:toc: macro
-:icons: font
-:source-highlighter: rouge
-:experimental:
-:url-github: https://github.com/hyperpolymath/zotero-voyant-export
-:url-gitlab: https://gitlab.com/hyperpolymath/zotero-voyant-export
-:url-bitbucket: https://bitbucket.org/hyperpolymath/zotero-voyant-export
-:url-codeberg: https://codeberg.org/hyperpolymath/zotero-voyant-export
+= Zotero Voyant Export
 
-Zotero to Voyant Tools export integration
+Export your Zotero collections to Voyant for text analysis.
 
-image:https://img.shields.io/badge/RSR-Certified-gold[RSR Certified]
-image:https://img.shields.io/badge/License-AGPL%20v3-blue[License]
+[Voyant](http://voyant-tools.org/) is "a web-based text analysis and reading
+environment" that lets you visualize the content of a text
+corpus. [Zotero](https://www.zotero.org/) is a "a free, easy-to-use tool to help
+you collect, organize, cite, and share your research sources." This extension
+helps those with preexisting Zotero collections get a new view on their
+data via Voyant.
 
-toc::[]
+== Version 2.0 - Zotero 7 Compatible
 
-== Overview
+This version has been completely rewritten for Zotero 7 compatibility using modern
+tooling based on the [zoterho-template](https://gitlab.com/extensions-library/zotero/zoterho-template) architecture:
 
-zotero-voyant-export is part of the link:https://rhodium.sh[Rhodium Standard] (RSR) ecosystem.
+- *ReScript* for type-safe code compilation to JavaScript
+- *Deno* as the runtime environment (no npm dependencies)
+- *CUE* for configuration management and generation
+- *Just* for task automation
+- *web-ext* for extension development and packaging
+- *WebExtension Manifest v2* for Zotero 7 compatibility
 
-Domain: *research-tools*
+== Requirements
+
+* Zotero 7.0 or higher
+* A collection containing full texts (as PDFs, HTML snapshots, etc.)
 
 == Installation
 
-[source,bash]
-----
-# Clone from GitHub (primary)
-git clone {url-github}
+Download the latest XPI from the releases page. Then open Zotero and select
+Tools menu -> Add-ons. Click the gear icon in the upper right and select
+"Install Add-On From File..."; open the XPI file you just saved.
 
-# Or from mirrors
-git clone {url-gitlab}
-git clone {url-codeberg}
-----
+== Usage
 
-== RSR Stack
+Right-click on the collection you wish to analyze. Select "Export Collection to
+Voyant..." and choose a save location for the corpus as a zip file.
 
-This project follows RSR conventions:
+Upload the resulting zip to [voyant-tools.org](http://voyant-tools.org) (or
+to [your local Voyant server][local-voyant] -- for collections larger than a
+handful of documents, you'll probably want to host locally). You should then be
+able to see your corpus in the default Voyant view.
 
-* ✅ ReScript for frontend/logic
-* ✅ Deno for JS runtime
-* ✅ WASM for performance-critical code
-* ✅ Rust/OCaml/Haskell for systems/proofs
-* ✅ Guile/Scheme for configuration
-* ❌ No TypeScript
-* ❌ No Go
-* ❌ No npm
+== Development
 
-== Mirrors
+=== Prerequisites
 
-[cols="1,2"]
-|===
-| Platform | URL
+This project uses a modern toolchain. Install the following:
 
-| GitHub (primary) | {url-github}
-| GitLab | {url-gitlab}
-| Bitbucket | {url-bitbucket}
-| Codeberg | {url-codeberg}
-|===
+1. *Deno* (v1.40+): https://deno.land/
+   ```bash
+   curl -fsSL https://deno.land/install.sh | sh
+   ```
 
-== License
+2. *Just* command runner: https://github.com/casey/just
+   ```bash
+   # macOS/Linux
+   curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to ~/.local/bin
+   ```
 
-Licensed under AGPL-3.0-or-later OR LicenseRef-Palimpsest-0.5.
+3. *CUE* configuration language: https://cuelang.org/
+   ```bash
+   # macOS
+   brew install cue
+   # Or download from https://github.com/cue-lang/cue/releases
+   ```
 
-See link:LICENSE[LICENSE] for details.
+=== Setup
 
-== Contributing
+```bash
+= Clone the repository
+git clone https://github.com/corajr/zotero-voyant-export.git
+cd zotero-voyant-export
 
-See link:CONTRIBUTING.adoc[CONTRIBUTING.adoc].
+= Generate configuration files from CUE
+just config
 
-== Metadata
+= Initialize dependencies
+just setup
+```
 
-* Domain: research-tools
-* Framework: RSR (Rhodium Standard Repository)
-* Dublin Core: link:.well-known/dc.xml[.well-known/dc.xml]
+=== Build Commands
+
+All build commands are managed through `just`. Run `just` to see all available commands:
+
+```bash
+just                # List all available commands
+just rebuild        # Clean build from scratch
+just dev            # Development mode (rebuild + watch)
+just build          # Build ReScript to JavaScript
+just watch          # Watch mode for development
+just package        # Create XPI package for distribution
+just run            # Test in Firefox
+just lint           # Lint ReScript code
+just fmt            # Format ReScript code
+just clean          # Clean build artifacts
+just info           # Show project information
+```
+
+=== Project Structure
+
+```
+├── config/              # CUE configuration source files
+│   ├── project.cue      # Project metadata and manifest definition
+│   ├── deno.cue         # Deno configuration and tasks
+│   ├── rescript.cue     # ReScript compiler configuration
+│   └── manifest.cue     # Export helper for manifest.json
+│
+├── src/                 # ReScript source files
+│   ├── background.res   # Main entry point & initialization
+│   ├── Zotero.res       # Type-safe Zotero API bindings
+│   ├── Exporter.res     # Collection export logic
+│   ├── Format.res       # MODS & Dublin Core XML generation
+│   └── UI.res           # Menu items & file picker
+│
+├── ui/                  # UI assets (icons, etc.)
+│
+├── justfile             # Task automation (replaces Makefile/npm scripts)
+└── README.md            # This file
+
+= Generated files (not in source control):
+├── manifest.json        # Generated from config/project.cue
+├── deno.json           # Generated from config/deno.cue
+├── rescript.json       # Generated from config/rescript.cue
+└── src/**/*.mjs        # Generated from src/**/*.res
+```
+
+=== How It Works
+
+1. *CUE Configuration*: All configuration lives in `config/*.cue` files
+   - `just config` exports CUE to JSON (manifest.json, deno.json, rescript.json)
+   - Single source of truth for project metadata
+
+2. *ReScript Compilation*: Type-safe ReScript (.res) compiles to JavaScript (.mjs)
+   - Deno runs ReScript compiler via npm: imports
+   - In-source build: .mjs files generated alongside .res files
+
+3. *Extension Loading*: Zotero loads the extension via manifest.json
+   - background.mjs executes on startup
+   - Context menu added to collections
+   - Export functionality triggered by user
+
+4. *Build Automation*: Just handles all tasks
+   - Configuration generation
+   - Compilation
+   - Packaging
+   - Testing
+
+=== Development Workflow
+
+```bash
+= 1. Make changes to ReScript files in src/
+vim src/Exporter.res
+
+= 2. Rebuild and watch for changes
+just dev
+
+= 3. Test in Firefox (in another terminal)
+just run
+
+= 4. Create production build
+just package
+```
+
+=== Configuration Management
+
+All project configuration is managed through CUE files in `config/`:
+
+- *config/project.cue*: Project metadata, version, manifest definition
+- *config/deno.cue*: Deno tasks for running ReScript and web-ext
+- *config/rescript.cue*: ReScript compiler configuration
+
+To modify configuration:
+1. Edit the appropriate `.cue` file
+2. Run `just config` to regenerate JSON files
+3. Rebuild with `just rebuild`
+
+=== Tech Stack
+
+- *[ReScript](https://rescript-lang.org/)*: Type-safe language compiling to JavaScript
+- *[Deno](https://deno.land/)*: Secure runtime for JavaScript/TypeScript
+- *[CUE](https://cuelang.org/)*: Configuration language with validation
+- *[Just](https://github.com/casey/just)*: Command runner and task automation
+- *[web-ext](https://github.com/mozilla/web-ext)*: Firefox extension development tool
+
+=== Credits
+
+This project's architecture is based on the [zoterho-template](https://gitlab.com/extensions-library/zotero/zoterho-template)
+by the Zotero community, which provides a production-ready framework for building modern Zotero 7 extensions.
+
+Original extension concept and implementation by Cora Johnson-Roberson.
+
+[local-voyant]: http://docs.voyant-tools.org/resources/run-your-own/voyant-server/
+
+== LICENSE
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
