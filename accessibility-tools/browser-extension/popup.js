@@ -11,7 +11,7 @@
   // Get current tab
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
-  if (!tab || !tab.url || (!tab.url.startsWith('http://') && !tab.url.startsWith('https://'))) {
+  if (!tab || !tab.url || (!tab.url.startsWith('https://') && !tab.url.startsWith('https://'))) {
     showError('This page cannot be scanned. Accessibility Everywhere only works on regular web pages.');
     return;
   }

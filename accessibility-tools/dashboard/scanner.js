@@ -18,7 +18,7 @@ async function scanWebsite() {
   }
 
   // Add https:// if not present
-  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+  if (!url.startsWith('https://') && !url.startsWith('https://')) {
     url = 'https://' + url;
   }
 

@@ -7,10 +7,10 @@ const serializer = Cc["@mozilla.org/xmlextras/xmlserializer;1"].createInstance(C
 
 const xmlDecl = '<?xml version="1.0" encoding="UTF-8"?>';
 const modsNS = "http://www.loc.gov/mods/v3";
-const modsEl = '<mods xmlns="http://www.loc.gov/mods/v3" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/1999/xlink" xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/mods.xsd" />';
+const modsEl = '<mods xmlns="http://www.loc.gov/mods/v3" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="https://www.w3.org/1999/xlink" xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/mods.xsd" />';
 
-const dcEl = '<oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd" />';
-const dcNS = 'http://purl.org/dc/elements/1.1/';
+const dcEl = '<oai_dc:dc xmlns:oai_dc="https://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="https://purl.org/dc/elements/1.1/" xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://www.openarchives.org/OAI/2.0/oai_dc/ https://www.openarchives.org/OAI/2.0/oai_dc.xsd" />';
+const dcNS = 'https://purl.org/dc/elements/1.1/';
 
 // https://github.com/zotero/translators/blob/d47f2ce085b9bbceb0ba70307041f8ccb5bf17e0/MODS.js#L310
 function mapProperty(ns, parentElement, elementName, property, attributes) {
